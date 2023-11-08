@@ -114,13 +114,13 @@ def update_accounts(account_id):
     if not account:
         abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")
 
-    print("before check content type")
+    #print("before check content type")
     check_content_type("application/json")
-    print(f"before deserialize: {request.data}")
+    #print(f"before deserialize: {request.data}")
     account.deserialize(request.get_json())
-    print("before update")
+    #print("before update")
     account.update()
-    print("after update")
+    #print("after update")
 
     return account.serialize(), status.HTTP_200_OK
 
@@ -128,8 +128,23 @@ def update_accounts(account_id):
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
+@app.route("/accounts/<int:account_id>", methods=["DELETE"])
+def delete_accounts(account_id):
+    """
+    Deletes an Account
+    This endpoint will delete an Account based the data in the body that is posted
+    """
+    app.logger.info("Request to delete an Account with id: %s", account_id)
 
-# ... place you code here to DELETE an account ...
+    account = Account.find(account_id)
+    if not account:
+        return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)    
+
+    print("before delete")
+    #account.delete()
+    print("after delete")
+
+    return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)    
 
 
 ######################################################################
