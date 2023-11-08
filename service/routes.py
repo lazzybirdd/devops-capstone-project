@@ -12,9 +12,11 @@ from . import app  # Import Flask application
 import json
 from flask import Response
 
+
 ############################################################
 # Health Endpoint
 ############################################################
+
 @app.route("/health")
 def health():
     """Health Status"""
@@ -24,6 +26,7 @@ def health():
 ######################################################################
 # GET INDEX
 ######################################################################
+
 @app.route("/")
 def index():
     """Root URL response"""
@@ -54,14 +57,16 @@ def create_accounts():
     message = account.serialize()
     # Uncomment once get_accounts has been implemented
     location_url = url_for("get_accounts", account_id=account.id, _external=True)
-    #location_url = "/"  # Remove once get_accounts has been implemented
+    # location_url = "/"  # Remove once get_accounts has been implemented
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+
 ######################################################################
 # LIST ALL ACCOUNTS
 ######################################################################
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
     """Returns a list of Accounts"""
@@ -75,16 +80,18 @@ def list_accounts():
     results = [account.serialize() for account in accounts]
     app.logger.info("[%s] Accounts returned", len(results))
 
-    #RB:
+    # RB:
     # we cannot return a list, we have to return a stinr
     # but in this scenario the header will not get application/json automatically
-    # so, the workaround is to create Response object directly 
-    #return json.dumps(results), status.HTTP_200_OK
-    return Response(json.dumps(results),  mimetype='application/json', status=status.HTTP_200_OK)    
+    # so, the workaround is to create Response object directly
+    # return json.dumps(results), status.HTTP_200_OK
+    return Response(json.dumps(results),  mimetype='application/json', status=status.HTTP_200_OK)
+
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
+
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def get_accounts(account_id):
     """
@@ -99,9 +106,11 @@ def get_accounts(account_id):
 
     return account.serialize(), status.HTTP_200_OK
 
+
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
+
 @app.route("/accounts/<int:account_id>", methods=["PUT"])
 def update_accounts(account_id):
     """
@@ -114,13 +123,13 @@ def update_accounts(account_id):
     if not account:
         abort(status.HTTP_404_NOT_FOUND, f"Account with id [{account_id}] could not be found.")
 
-    #print("before check content type")
+    # print("before check content type")
     check_content_type("application/json")
-    #print(f"before deserialize: {request.data}")
+    # print(f"before deserialize: {request.data}")
     account.deserialize(request.get_json())
-    #print("before update")
+    # print("before update")
     account.update()
-    #print("after update")
+    # print("after update")
 
     return account.serialize(), status.HTTP_200_OK
 
@@ -138,13 +147,13 @@ def delete_accounts(account_id):
 
     account = Account.find(account_id)
     if not account:
-        return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)    
+        return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)
 
     print("before delete")
-    #account.delete()
+    # account.delete()
     print("after delete")
 
-    return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)    
+    return Response("",  mimetype='application/json', status=status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
