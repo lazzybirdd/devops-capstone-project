@@ -148,10 +148,9 @@ class TestAccountService(TestCase):
             f"{BASE_URL}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        print(f"data: {resp.get_data()}")
-        print(f"data: {resp.get_data()}")
+        #print(f"data: {resp.get_data()}")
         data = resp.get_json()
-        print(f"data: {data}")
+        #print(f"data: {data}")
         self.assertEqual(len(data), 0)
 
         #create 3 accounts
@@ -167,3 +166,17 @@ class TestAccountService(TestCase):
         for i, account in enumerate(accounts):
             a = data[i]
             self.assertEqual(a["name"], account.name)
+
+    def test_update_account(self):
+        """It should Update a single Account"""
+
+        #update existing account
+        account = self._create_accounts(1)[0]
+        resp = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            content_type="application/json",
+            json=account.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], account.name)
