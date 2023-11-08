@@ -9,6 +9,8 @@ from service.models import Account
 from service.common import status  # HTTP Status Codes
 from . import app  # Import Flask application
 
+import json
+from flask import Response
 
 ############################################################
 # Health Endpoint
@@ -60,9 +62,25 @@ def create_accounts():
 ######################################################################
 # LIST ALL ACCOUNTS
 ######################################################################
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """Returns a list of Accounts"""
+    app.logger.info("Request to list Accounts...")
 
-# ... place you code here to LIST accounts ...
+    accounts = []
 
+    app.logger.info("Find all")
+    accounts = Account.all()
+
+    results = [account.serialize() for account in accounts]
+    app.logger.info("[%s] Accounts returned", len(results))
+
+    #RB:
+    # we cannot return a list, we have to return a stinr
+    # but in this scenario the header will not get application/json automatically
+    # so, the workaround is to create Response object directly 
+    #return json.dumps(results), status.HTTP_200_OK
+    return Response(json.dumps(results),  mimetype='application/json', status=status.HTTP_200_OK)    
 
 ######################################################################
 # READ AN ACCOUNT

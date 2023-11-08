@@ -139,3 +139,31 @@ class TestAccountService(TestCase):
         """It should not Read an Account that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_accounts(self):
+        """It should List all Accounts"""
+
+        #no accounts exists
+        resp = self.client.get(
+            f"{BASE_URL}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        print(f"data: {resp.get_data()}")
+        print(f"data: {resp.get_data()}")
+        data = resp.get_json()
+        print(f"data: {data}")
+        self.assertEqual(len(data), 0)
+
+        #create 3 accounts
+        accounts = self._create_accounts(3)
+        resp = self.client.get(
+            f"{BASE_URL}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        self.assertEqual(len(data), len(accounts))
+
+        for i, account in enumerate(accounts):
+            a = data[i]
+            self.assertEqual(a["name"], account.name)
