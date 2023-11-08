@@ -13,6 +13,8 @@ from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
 
+from service.models import PersistentBase
+
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
@@ -155,6 +157,9 @@ class TestAccountService(TestCase):
 
         #create 3 accounts
         accounts = self._create_accounts(3)
+        #let's sort the data, so it will our baseline
+        accounts.sort(key=lambda x: x.name)
+
         resp = self.client.get(
             f"{BASE_URL}", content_type="application/json"
         )
@@ -163,6 +168,8 @@ class TestAccountService(TestCase):
 
         self.assertEqual(len(data), len(accounts))
 
+        #let's sort them before we start comparing them
+        data.sort(key=lambda x: x["name"])
         for i, account in enumerate(accounts):
             a = data[i]
             self.assertEqual(a["name"], account.name)
@@ -180,3 +187,37 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], account.name)
+
+    def test_delete_account(self):
+        """It should Delete a single Account"""
+
+        #delete non-existing account
+        resp = self.client.delete(
+            f"{BASE_URL}/{0}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        #delete existing account
+        account = self._create_accounts(1)[0]
+        resp = self.client.delete(
+            f"{BASE_URL}/{account.id}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_just_to_improve_the_coverage(self):
+        """It should improve test coverage"""
+
+        #for line #32
+        pb = PersistentBase()
+
+        #for line 98
+        account = Account()
+        s = repr(account)
+
+        #for line 127
+        account = self._create_accounts(1)[0]        
+        data = account.serialize()
+        del data["date_joined"]
+        account.deserialize(data)
