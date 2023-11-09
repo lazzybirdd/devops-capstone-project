@@ -149,19 +149,19 @@ class TestAccountService(TestCase):
     def test_list_accounts(self):
         """It should List all Accounts"""
 
-        #no accounts exists
+        # no accounts exists
         resp = self.client.get(
             f"{BASE_URL}", content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        #print(f"data: {resp.get_data()}")
+        # print(f"data: {resp.get_data()}")
         data = resp.get_json()
-        #print(f"data: {data}")
+        # print(f"data: {data}")
         self.assertEqual(len(data), 0)
 
-        #create 3 accounts
+        # create 3 accounts
         accounts = self._create_accounts(3)
-        #let's sort the data, so it will our baseline
+        # let's sort the data, so it will our baseline
         accounts.sort(key=lambda x: x.name)
 
         resp = self.client.get(
@@ -172,7 +172,7 @@ class TestAccountService(TestCase):
 
         self.assertEqual(len(data), len(accounts))
 
-        #let's sort them before we start comparing them
+        # let's sort them before we start comparing them
         data.sort(key=lambda x: x["name"])
         for i, account in enumerate(accounts):
             a = data[i]
@@ -181,7 +181,7 @@ class TestAccountService(TestCase):
     def test_update_account(self):
         """It should Update a single Account"""
 
-        #update existing account
+        # update existing account
         account = self._create_accounts(1)[0]
         resp = self.client.put(
             f"{BASE_URL}/{account.id}",
@@ -195,7 +195,7 @@ class TestAccountService(TestCase):
     def test_failed_update_non_existent_account(self):
         """It should Update a single Account"""
 
-        #update existing account
+        # update existing account
         account = self._create_accounts(1)[0]
         resp = self.client.put(
             f"{BASE_URL}/0",
@@ -207,14 +207,14 @@ class TestAccountService(TestCase):
     def test_delete_account(self):
         """It should Delete a single Account"""
 
-        #delete non-existing account
+        # delete non-existing account
         resp = self.client.delete(
             f"{BASE_URL}/{0}",
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-        #delete existing account
+        # delete existing account
         account = self._create_accounts(1)[0]
         resp = self.client.delete(
             f"{BASE_URL}/{account.id}",
@@ -225,15 +225,17 @@ class TestAccountService(TestCase):
     def test_just_to_improve_the_coverage(self):
         """It should improve test coverage"""
 
-        #for line #32
+        # for line #32
         pb = PersistentBase()
+        print(str(pb))
 
-        #for line 98
+        # for line 98
         account = Account()
         s = repr(account)
+        print(str(s))
 
-        #for line 127
-        account = self._create_accounts(1)[0]        
+        # for line 127
+        account = self._create_accounts(1)[0]
         data = account.serialize()
         del data["date_joined"]
         account.deserialize(data)
@@ -258,7 +260,7 @@ class TestAccountService(TestCase):
 
         headers = {
             'X-Frame-Options': 'SAMEORIGIN',
-            #'X-XSS-Protection': '1; mode=block',
+            # 'X-XSS-Protection': '1; mode=block',
             'X-Content-Type-Options': 'nosniff',
             'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
@@ -272,4 +274,4 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Check for the CORS header
         self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
-        
+
